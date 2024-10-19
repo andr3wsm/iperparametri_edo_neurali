@@ -2,7 +2,7 @@
 %         valori della funzione di costo
 %         |          dati di addestramento
 %         |          |      valori predetti
-function [lossValues,yTrain,yPred]=simulateNODE(N_true,N_node,miniBatchSize,N_iter,N_neuron,N_hiddenLayer,learnRate)
+function [lossValues,yTrain,yPred]=simulateNODE(N_true,tau,miniBatchSize,N_iter,N_neuron,N_hiddenLayer,learnRate)
 
 N_layer=1+N_hiddenLayer;
 
@@ -12,7 +12,9 @@ N_train=N_true;
 
 %% passi dell'e.d.o. neurale
 h_node=t_true(2);           % dimensione del passo
-t_node=(0:N_node)*h_node;   % valori di campionamento
+t_node=(0:h_node:tau);   % valori di campionamento
+N_node=size(t_node);
+N_node=N_node(2)-1;
 
 %% parametri di Adam
 gradDecay=0.9;
@@ -86,7 +88,7 @@ loss=l2loss(Y,targets,NormalizationFactor="all-elements",DataFormat="CBT");
 gradients=dlgradient(loss,NODE);
 end
 
-%% utilities per l'addestramento
+%% creazione del minibatch
 function [y0,targets]=createMiniBatch(numTimesteps,numTimesPerObs,miniBatchSize,Y)
 s=randperm(numTimesteps - numTimesPerObs,miniBatchSize);
 y0=dlarray(Y(:,s));
